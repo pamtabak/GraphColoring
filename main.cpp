@@ -1,6 +1,7 @@
 #include <iostream>
-#include "HashTable.hpp"
 #include <unordered_set>
+#include <unordered_map>
+#include <fstream>
 #include <sstream>
 #include <vector>
 #include <algorithm>
@@ -11,10 +12,9 @@
 
 using namespace std;
 
-// g++-6 main.cpp HashTable.hpp -o main.out
+// g++-6 main.cpp -o main.out
 
 // ./main.out "/Users/pamelatabak/Documents/ECI UFRJ/10 periodo/Otimização em Grafos/GraphColoring/Input/test.txt"
-
 
 chrono::high_resolution_clock::time_point startTime;
 
@@ -29,9 +29,9 @@ void split(const std::string &s, char delimiter, Out result)
     }
 }
 
-HashTable<string, unordered_set<string>> readGraph (string filePath, unordered_set<string> &nodes)
+unordered_map<int, unordered_set<int>> readGraph (string filePath, bool directed)
 {
-    HashTable<string, unordered_set<string>> graph;
+    unordered_map<int, unordered_set<int>> graph;
 
     ifstream file(filePath);
     string str;
@@ -40,16 +40,31 @@ HashTable<string, unordered_set<string>> readGraph (string filePath, unordered_s
         // Each line is an edge - so there are two nodes per line, separated by whitespace
         vector<string> nodeElements;
         split(str, ' ', std::back_inserter(nodeElements));
-        unordered_set<string> neighbors = graph.get(nodeElements[0]);
-        neighbors.insert(nodeElements[1]);
-        graph.set(nodeElements[0], neighbors);
+        
+        int firstNode  = stoi(nodeElements[0]);
+        int secondNode = stoi(nodeElements[1]);
+        
+        unordered_set<int> neighbors = graph[firstNode];
+        neighbors.insert(secondNode);
+        graph[firstNode] = neighbors;
 
-        // Listing all different nodes
-        nodes.insert(nodeElements[0]);
-        nodes.insert(nodeElements[1]);
+        if (!directed)
+        {
+        	neighbors = graph[secondNode];
+        	neighbors.insert(firstNode);
+        	graph[secondNode] = neighbors;
+    	}
     }
 
     return graph;
+}
+
+int BruteForceSimpleColoring (unordered_map<int, unordered_set<int>> graph)
+{
+	int numberOfColors = graph.size();
+
+
+	return numberOfColors;
 }
 
 int main (int argc, char * argv[])
@@ -57,18 +72,18 @@ int main (int argc, char * argv[])
     // When the execution has started
     startTime = chrono::high_resolution_clock::now();
 
-    if (argc != 2)
+    if (argc != 3)
     {
         cout << "Wrong number of parameters." << endl;
         return EXIT_FAILURE;
     }
 
     string filePath(argv[1]);
+    bool directed(stoi(argv[2]));
 
-    // All different nodes that appear on the graph
-    unordered_set<string> nodes;
-    // All edges (since it`s an unidirectional graph, we only save the edge once)
-    HashTable<string, unordered_set<string>> graph = readGraph(filePath, nodes);
+    unordered_map<int, unordered_set<int>> graph = readGraph(filePath, directed);
+
+    cout << graph.size() << endl;
 
     // End of execution
     chrono::high_resolution_clock::time_point endTime = chrono::high_resolution_clock::now();
