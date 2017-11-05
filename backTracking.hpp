@@ -22,7 +22,7 @@ public:
 
 		// we check if is promising and if the index of the color to be used is greater than the smallest number of colors.
 		// since we are attributing colors in order, if we use a color with index x it means that we need x + 1 colors so far
-		if (isPromising(colors, position, colorToBeUsed, graph) && colorToBeUsed < smallestNumberOfColors)
+		if (isPromising(colors, position, colorToBeUsed, graph) && ((colorToBeUsed + 1) < smallestNumberOfColors))
 		{
 			colors[position] = colorToBeUsed;
 			if (position == (numberOfColors - 1))
@@ -39,7 +39,7 @@ public:
 			}
 			else
 			{
-				for (int k = 1; k < numberOfColors; k++)
+				for (int k = 0; k < numberOfColors; k++)
 				{
 					algorithm(graph, colors, position + 1, k, smallestNumberOfColors, bestSolution);
 				}

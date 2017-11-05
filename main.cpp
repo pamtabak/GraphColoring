@@ -15,7 +15,7 @@
 
 using namespace std;
 
-// g++-6 main.cpp bruteForce.hpp -o main.out
+// g++-6 main.cpp bruteForce.hpp backTracking.hpp -o main.out
 
 // ./main.out "/Users/pamelatabak/Documents/ECI UFRJ/10 periodo/Otimização em Grafos/GraphColoring/Input/test.txt" 0
 
