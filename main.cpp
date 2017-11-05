@@ -10,10 +10,11 @@
 #include <string>
 #include <ctime>
 #include <set>
+#include "bruteForce.hpp"
 
 using namespace std;
 
-// g++-6 main.cpp -o main.out
+// g++-6 main.cpp bruteForce.hpp -o main.out
 
 // ./main.out "/Users/pamelatabak/Documents/ECI UFRJ/10 periodo/Otimização em Grafos/GraphColoring/Input/test.txt" 0
 
@@ -57,81 +58,7 @@ unordered_map<int, unordered_set<int>> readGraph (string filePath, bool directed
     	}
     }
 
-    // for (int i = 0; i < graph.size(); i++)
-    // {
-    //     cout << i << "-";
-    //     for (auto it = graph[i].begin(); it != graph[i].end(); ++it)
-    //     {
-    //         cout << *it << " ";
-    //     }
-    //     cout << "" << endl;
-    // }
-
     return graph;
-}
-
-bool isViable (unordered_map<int, unordered_set<int>> graph, int *colors)
-{
-    int numberOfColors = graph.size();
-
-    for (int i = 0; i < numberOfColors; i++)
-    {
-        for (auto it = graph[i].begin(); it != graph[i].end(); ++it)
-        {
-            if (colors[i] == colors[*it])
-            {
-                return false;
-            }
-        }
-    }
-    return true;
-}
-
-int getUniqueColors (int* array, int size)
-{
-    int uniqueColors = 0;
-    unordered_set<int> uniqueColorsSet;
-    for (int i = 0; i < size; i++)
-    {
-        unordered_set<int>::const_iterator got = uniqueColorsSet.find (array[i]);
-        if ( got == uniqueColorsSet.end() )
-        {
-            uniqueColors += 1;
-            uniqueColorsSet.insert(array[i]);
-        }
-    }
-
-    return uniqueColors;
-}
-
-void bruteForceSimpleColoring (unordered_map<int, unordered_set<int>> graph, int colors[], int position, int &smallestNumberOfColors, int *bestSolution)
-{
-	int numberOfColors = graph.size();
-
-    if (position == (numberOfColors - 1))
-    {
-        if (isViable(graph, colors))
-        {
-            // get distinct colors
-            int uniqueColors = getUniqueColors(colors, numberOfColors);
-            if (uniqueColors < smallestNumberOfColors)
-            {
-                smallestNumberOfColors = uniqueColors;
-                for (int i = 0; i < numberOfColors; i++)
-                {
-                    bestSolution[i] = colors[i];
-                }
-            }
-        }
-    }
-    else
-    {
-        for (int i = 1; i < numberOfColors; i++)
-        {
-            colors[position+1] = i;
-            bruteForceSimpleColoring(graph, colors, position+1, smallestNumberOfColors, bestSolution);
-        }
-    }
 }
 
 int main (int argc, char * argv[])
@@ -153,7 +80,8 @@ int main (int argc, char * argv[])
     int *bestSolution = new int[graph.size()];
 
     int smallestNumberOfColors = graph.size() + 1;
-    bruteForceSimpleColoring(graph, colors, 0, smallestNumberOfColors, bestSolution);
+    BruteForce bruteForce;
+    bruteForce.algorithm(graph, colors, 0, smallestNumberOfColors, bestSolution);
 
     cout << smallestNumberOfColors << endl;
     for (int i = 0; i < graph.size(); i++)
