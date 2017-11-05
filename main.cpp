@@ -11,12 +11,20 @@
 #include <ctime>
 #include <set>
 #include "bruteForce.hpp"
+#include "backTracking.hpp"
 
 using namespace std;
 
 // g++-6 main.cpp bruteForce.hpp -o main.out
 
 // ./main.out "/Users/pamelatabak/Documents/ECI UFRJ/10 periodo/Otimização em Grafos/GraphColoring/Input/test.txt" 0
+
+/* instancias:
+http://mat.gsia.cmu.edu/COLOR/instances.html
+https://turing.cs.hbg.psu.edu/txn131/graphcoloring.html
+http://cse.unl.edu/~tnguyen/npbenchmarks/graphcoloring.html
+https://sites.google.com/site/graphcoloring/vertex-coloring
+*/
 
 chrono::high_resolution_clock::time_point startTime;
 
@@ -80,8 +88,11 @@ int main (int argc, char * argv[])
     int *bestSolution = new int[graph.size()];
 
     int smallestNumberOfColors = graph.size() + 1;
-    BruteForce bruteForce;
-    bruteForce.algorithm(graph, colors, 0, smallestNumberOfColors, bestSolution);
+    // BruteForce bruteForce;
+    // bruteForce.algorithm(graph, colors, 0, smallestNumberOfColors, bestSolution);
+
+    BackTracking backTracking;
+    backTracking.algorithm(graph, colors, 0, 0, smallestNumberOfColors, bestSolution);    
 
     cout << smallestNumberOfColors << endl;
     for (int i = 0; i < graph.size(); i++)
