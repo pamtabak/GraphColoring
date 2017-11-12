@@ -12,10 +12,11 @@
 #include <set>
 #include "bruteForce.hpp"
 #include "backTracking.hpp"
+#include "branchAndBound.hpp"
 
 using namespace std;
 
-// g++-6 main.cpp bruteForce.hpp backTracking.hpp -o main.out
+// g++-6 main.cpp bruteForce.hpp backTracking.hpp branchAndBound.hpp -o main.out
 
 // ./main.out "/Users/pamelatabak/Documents/ECI UFRJ/10 periodo/Otimização em Grafos/GraphColoring/Input/test.txt" 0
 
@@ -91,8 +92,11 @@ int main (int argc, char * argv[])
     // BruteForce bruteForce;
     // bruteForce.algorithm(graph, colors, 0, smallestNumberOfColors, bestSolution);
 
-    BackTracking backTracking;
-    backTracking.algorithm(graph, colors, 0, 0, smallestNumberOfColors, bestSolution);    
+    // BackTracking backTracking;
+    // backTracking.algorithm(graph, colors, 0, 0, smallestNumberOfColors, bestSolution);    
+
+    BranchAndBound branchAndBound;
+    branchAndBound.algorithm (graph, smallestNumberOfColors, bestSolution);
 
     cout << smallestNumberOfColors << endl;
     for (int i = 0; i < graph.size(); i++)

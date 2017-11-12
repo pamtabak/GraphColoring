@@ -66,7 +66,7 @@ public:
 
 	/*  check if is ok to add the color "colorToBeUsed" to node "position"
 		since we are adding color to nodes in order, we check for every node that
-		has an index <= poisition.
+		has an index <= position.
 	*/
 	bool isPromising (int colors[], int position, int colorToBeUsed, unordered_map<int, unordered_set<int>> graph)
 	{
