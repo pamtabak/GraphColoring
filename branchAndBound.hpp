@@ -44,7 +44,7 @@ public:
 		while (L.size() > 0)
 		{
 			decisionNode *l      = chooseNode(L);
-			int*         colors = rebuildSolution(l, numberOfNodes);
+			int          *colors = rebuildSolution(l, numberOfNodes);
 
 			int lowerBoundLimit = getLowerLimit(colors, numberOfNodes);
 			if (lowerBoundLimit >= smallestNumberOfColors)
