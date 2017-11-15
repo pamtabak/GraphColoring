@@ -18,7 +18,7 @@ using namespace std;
 
 // g++-6 main.cpp bruteForce.hpp backTracking.hpp branchAndBound.hpp -o main.out
 
-// ./main.out "/Users/pamelatabak/Documents/ECI UFRJ/10 periodo/Otimização em Grafos/GraphColoring/Input/test.txt" 0
+// ./main.out "/Users/pamelatabak/Documents/ECI UFRJ/10 periodo/Otimização em Grafos/GraphColoring/Input/test.txt" 0 branchAndBound
 
 /* instancias:
 http://mat.gsia.cmu.edu/COLOR/instances.html
@@ -75,7 +75,7 @@ int main (int argc, char * argv[])
     // When the execution has started
     startTime = chrono::high_resolution_clock::now();
 
-    if (argc != 3)
+    if (argc != 4)
     {
         cout << "Wrong number of parameters." << endl;
         return EXIT_FAILURE;
@@ -83,25 +83,39 @@ int main (int argc, char * argv[])
 
     string filePath(argv[1]);
     bool directed(stoi(argv[2]));
+    string algorithm(argv[3]);
 
     unordered_map<int, unordered_set<int>> graph = readGraph(filePath, directed);
     int colors[graph.size()] = {};
     int *bestSolution = new int[graph.size()];
 
     int smallestNumberOfColors = graph.size() + 1;
-    // BruteForce bruteForce;
-    // bruteForce.algorithm(graph, colors, 0, smallestNumberOfColors, bestSolution);
 
-    // BackTracking backTracking;
-    // backTracking.algorithm(graph, colors, 0, 0, smallestNumberOfColors, bestSolution);    
-
-    BranchAndBound branchAndBound;
-    branchAndBound.algorithm (graph, smallestNumberOfColors, bestSolution);
+    if (algorithm == "bruteForce")
+    {
+        BruteForce bruteForce;
+        bruteForce.algorithm(graph, colors, 0, smallestNumberOfColors, bestSolution);
+    }
+    else if (algorithm == "backTracking")
+    {
+        BackTracking backTracking;
+        backTracking.algorithm(graph, colors, 0, 0, smallestNumberOfColors, bestSolution);    
+    }
+    else if (algorithm == "branchAndBound")
+    {
+        BranchAndBound branchAndBound;
+        branchAndBound.algorithm (graph, smallestNumberOfColors, bestSolution);
+    }
+    else
+    {
+        cout << "This algorithm was not implemented" << endl;
+        return EXIT_FAILURE;
+    }
 
     cout << smallestNumberOfColors << endl;
     for (int i = 0; i < graph.size(); i++)
     {
-        cout << bestSolution[i];
+        cout << bestSolution[i] << "-";
     }
     cout << "" << endl;
 

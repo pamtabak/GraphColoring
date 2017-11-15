@@ -17,7 +17,7 @@ typedef struct decisionNode
 {
 	int node;
 	int color;
-	int lowerBoundLimit;
+	// int lowerBoundLimit;
 	// pai deste no na arvore de solucao
 	struct decisionNode* father;
 } decisionNode;
@@ -28,14 +28,12 @@ public:
 	void algorithm (unordered_map<int, unordered_set<int>> graph, int &smallestNumberOfColors, int *bestSolution)
 	{
 		int numberOfNodes   = graph.size();
-		int upperBoundLimit = numberOfNodes;
 
 		decisionNode *firstNode;
 		firstNode = (decisionNode*) malloc (sizeof (decisionNode));
 
 		firstNode->node            = 0;
 		firstNode->color           = 0;
-		firstNode->lowerBoundLimit = graph[0].size(); // degree
 		firstNode->father          = NULL;
 
 		vector<decisionNode*> L;
@@ -46,21 +44,33 @@ public:
 			decisionNode *l      = chooseNode(L);
 			int          *colors = rebuildSolution(l, numberOfNodes);
 
-			int lowerBoundLimit = getLowerLimit(colors, numberOfNodes);
+			int colorsUsedSoFar = getUniqueColors(colors, numberOfNodes);
+			int lowerBoundLimit, upperBoundLimit;
+			getLimits(colors, graph, colorsUsedSoFar, lowerBoundLimit, upperBoundLimit);
+
+			// >= ??
 			if (lowerBoundLimit >= smallestNumberOfColors)
 			{
 				continue;
 			}
 
+			// cout << lowerBoundLimit << "| smallestNumberOfColors: " << smallestNumberOfColors << endl;
+
 			// we also need to check if limit is viable
 			if (isPromising(colors, l->node, l->color, graph))
 			{
+				// int upperBoundLimit = getUpperLimit(colors, numberOfNodes, colorsUsedSoFar);
+				// this is only valid if this solution is promising
+				if (upperBoundLimit < smallestNumberOfColors)
+				{
+					smallestNumberOfColors = upperBoundLimit;
+				}
+
 				int numberOfNodesWithColor = numberOfNodesThatHaveColor(colors, numberOfNodes);
-				// cout << numberOfNodesWithColor << endl;
 				if (numberOfNodesWithColor == numberOfNodes)
 				{
 					int numberOfColorsUsed = getUniqueColors(colors, numberOfNodes);
-					if (numberOfColorsUsed < smallestNumberOfColors)
+					if (numberOfColorsUsed <= smallestNumberOfColors)
 					{
 						smallestNumberOfColors = numberOfColorsUsed;
 						for (int i = 0; i < numberOfNodes; i++)
@@ -76,7 +86,6 @@ public:
 						decisionNode *newNode;
 						newNode = (decisionNode*) malloc (sizeof (decisionNode));
 						newNode->father          = l;
-						newNode->lowerBoundLimit = lowerBoundLimit;
 						newNode->node            = l->node + 1;
 						newNode->color           = i;
 
@@ -89,13 +98,154 @@ public:
 		}
 	}
 
-	// So we can define L(S) = "number of colours used so far" + "number of colours we will be forced to use in the future"
-	int getLowerLimit (int* colors, int numberOfNodes)
+	// upper limit: "number of colours used so far" + "number of vertices not yet coloured"
+	// lower limit: "number of colours used so far" + "number of colours we will be forced to use in the future"
+	void getLimits (int* colors, unordered_map<int, unordered_set<int>> graph, int colorsUsedSoFar, int &lowerLimit, int &upperLimit)
 	{
-		// returns number of colors used so far
-		// TESTING
-		return getUniqueColors(colors, numberOfNodes);
+		int numberOfNodes = graph.size();
+		lowerLimit       = colorsUsedSoFar;
+		upperLimit       = colorsUsedSoFar;
+
+		// list with nodes that are not colored yet and are adjacent to nodes
+		// covering all colors initially used (colors filled before this funcion was called)
+		vector<int> nodesAdjacentAllColors;
+
+		for (int i = 0; i < numberOfNodes; i++)
+		{
+			// Searching all nodes not yet coloured
+			if (colors[i] == -1)
+			{
+				upperLimit += 1;
+
+				// If this node is adjacent to vertices covering all colors used
+				unordered_set<int> uniqueColorsSet;
+				int uniqueColors; // amount of different colors i has neighbors with
+				for (auto it = graph[i].begin(); it != graph[i].end(); ++it)
+				{
+					// we only want neighbors already colored
+			    	if (colors[*it] == -1)
+			    	{
+			    		continue;
+			    	}
+
+			    	unordered_set<int>::const_iterator got = uniqueColorsSet.find (colors[*it]);
+			        if ( got == uniqueColorsSet.end() )
+			        {
+			            uniqueColors += 1;
+			            uniqueColorsSet.insert(colors[*it]);
+			        }
+				}
+
+				if (uniqueColors == colorsUsedSoFar)
+				{
+					if (nodesAdjacentAllColors.size() == 0)
+					{
+						// We only want to increase the lower limit using this once (further nodes could
+						// share extra color used here and we are not covering this)
+						lowerLimit += 1;
+					}
+					nodesAdjacentAllColors.push_back(i);
+				}
+			}
+		}
+
+		// if any pair of nodes inside nodesAdjacentAllColors are adjacent, then we need to increase
+		// one more color. We then break the algorithm because we don`t want to look for cliques (we want
+		// the whole thing to happen in O(n^2))
+		for (int i = 0; i < nodesAdjacentAllColors.size(); i++)
+		{
+			for (int j = i+1; j < nodesAdjacentAllColors.size(); j++)
+			{
+				unordered_set<int>::const_iterator got = graph[i].find (nodesAdjacentAllColors[j]);
+				if ( got != graph[i].end() )
+				{
+					lowerLimit += 1;
+					break;
+				}
+			}
+		}
 	}
+
+	// // "number of colours used so far" + "number of colours we will be forced to use in the future"
+	// int getLowerLimit (int* colors, unordered_map<int, unordered_set<int>> graph, int colorsUsedSoFar)
+	// {
+	// 	int numberOfNodes = graph.size();
+	// 	int lowerLimit    = colorsUsedSoFar;
+
+	// 	// list with nodes that are not colored yet and are adjacent to nodes
+	// 	// covering all colors initially used (colors filled before this funcion was called)
+	// 	vector<int> nodesAdjacentAllColors;
+
+	// 	for (int i = 0; i < numberOfNodes; i++)
+	// 	{
+	// 		// Searching all nodes not yet coloured
+	// 		if (colors[i] == -1)
+	// 		{
+	// 			// If this node is adjacent to vertices covering all colors used
+	// 			unordered_set<int> uniqueColorsSet;
+	// 			int uniqueColors; // amount of different colors i has neighbors with
+	// 			for (auto it = graph[i].begin(); it != graph[i].end(); ++it)
+	// 			{
+	// 				// we only want neighbors already colored
+	// 		    	if (colors[*it] == -1)
+	// 		    	{
+	// 		    		continue;
+	// 		    	}
+
+	// 		    	unordered_set<int>::const_iterator got = uniqueColorsSet.find (colors[*it]);
+	// 		        if ( got == uniqueColorsSet.end() )
+	// 		        {
+	// 		            uniqueColors += 1;
+	// 		            uniqueColorsSet.insert(colors[*it]);
+	// 		        }
+	// 			}
+
+	// 			if (uniqueColors == colorsUsedSoFar)
+	// 			{
+	// 				if (nodesAdjacentAllColors.size() == 0)
+	// 				{
+	// 					// We only want to increase the lower limit using this once (further nodes could
+	// 					// share extra color used here and we are not covering this)
+	// 					lowerLimit += 1;
+	// 				}
+	// 				nodesAdjacentAllColors.push_back(i);
+	// 			}
+	// 		}
+	// 	}
+
+	// 	// if any pair of nodes inside nodesAdjacentAllColors are adjacent, then we need to increase
+	// 	// one more color. We then break the algorithm because we don`t want to look for cliques (we want
+	// 	// the whole thing to happen in O(n^2))
+	// 	for (int i = 0; i < nodesAdjacentAllColors.size(); i++)
+	// 	{
+	// 		for (int j = i+1; j < nodesAdjacentAllColors.size(); j++)
+	// 		{
+	// 			unordered_set<int>::const_iterator got = graph[i].find (nodesAdjacentAllColors[j]);
+	// 			if ( got != graph[i].end() )
+	// 			{
+	// 				lowerLimit += 1;
+	// 				break;
+	// 			}
+	// 		}
+	// 	}
+		
+	// 	return lowerLimit;
+	// }
+
+	// // "number of colours used so far" + "number of vertices not yet coloured"
+	// int getUpperLimit (int* colors, int numberOfNodes, int colorsUsedSoFar)
+	// {
+	// 	int upperBoundLimit = colorsUsedSoFar;
+	// 	for (int i = 0; i < numberOfNodes; i++)
+	// 	{
+	// 		if (colors[i] == -1)
+	// 		{
+	// 			upperBoundLimit += 1;
+	// 		}
+	// 	}
+
+	// 	return upperBoundLimit;
+	// }
 
 	decisionNode* chooseNode (vector<decisionNode*> &L)
 	{
