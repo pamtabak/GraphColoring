@@ -13,10 +13,11 @@
 #include "bruteForce.hpp"
 #include "backTracking.hpp"
 #include "branchAndBound.hpp"
+#include "metaheuristics.hpp"
 
 using namespace std;
 
-// g++-6 main.cpp bruteForce.hpp backTracking.hpp branchAndBound.hpp -o main.out
+// g++-6 main.cpp bruteForce.hpp backTracking.hpp branchAndBound.hpp metaheuristics.hpp -o main.out
 
 // ./main.out "/Users/pamelatabak/Documents/ECI UFRJ/10 periodo/Otimização em Grafos/GraphColoring/Input/test.txt" 0 branchAndBound
 

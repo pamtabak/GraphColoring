@@ -50,20 +50,15 @@ public:
 
 			int numberOfNodesWithColor = numberOfNodesThatHaveColor(colors, numberOfNodes);
 
-			// >= ??
 			if (((lowerBoundLimit >= smallestNumberOfColors) && (numberOfNodesWithColor != numberOfNodes)) 
 				|| (lowerBoundLimit > smallestNumberOfColors))
-			// if (lowerBoundLimit >= smallestNumberOfColors)
 			{
 				continue;
 			}
 
-			// cout << lowerBoundLimit << "| smallestNumberOfColors: " << smallestNumberOfColors << endl;
-
 			// we also need to check if limit is viable
 			if (isPromising(colors, l->node, l->color, graph))
 			{
-				// int upperBoundLimit = getUpperLimit(colors, numberOfNodes, colorsUsedSoFar);
 				// this is only valid if this solution is promising
 				if (upperBoundLimit < smallestNumberOfColors)
 				{
