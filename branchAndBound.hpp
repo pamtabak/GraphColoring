@@ -48,8 +48,12 @@ public:
 			int lowerBoundLimit, upperBoundLimit;
 			getLimits(colors, graph, colorsUsedSoFar, lowerBoundLimit, upperBoundLimit);
 
+			int numberOfNodesWithColor = numberOfNodesThatHaveColor(colors, numberOfNodes);
+
 			// >= ??
-			if (lowerBoundLimit >= smallestNumberOfColors)
+			if (((lowerBoundLimit >= smallestNumberOfColors) && (numberOfNodesWithColor != numberOfNodes)) 
+				|| (lowerBoundLimit > smallestNumberOfColors))
+			// if (lowerBoundLimit >= smallestNumberOfColors)
 			{
 				continue;
 			}
@@ -66,7 +70,7 @@ public:
 					smallestNumberOfColors = upperBoundLimit;
 				}
 
-				int numberOfNodesWithColor = numberOfNodesThatHaveColor(colors, numberOfNodes);
+				// int numberOfNodesWithColor = numberOfNodesThatHaveColor(colors, numberOfNodes);
 				if (numberOfNodesWithColor == numberOfNodes)
 				{
 					int numberOfColorsUsed = getUniqueColors(colors, numberOfNodes);
@@ -81,7 +85,15 @@ public:
 				}
 				else
 				{
-					for (int i = 0; i < smallestNumberOfColors; i++)
+					// idea: nodes can`t have colours bigger than its index
+					int maxColor = smallestNumberOfColors - 1;
+					if (maxColor > (l->node + 1))
+					{
+						maxColor = (l->node + 1);
+					}
+
+					for (int i = 0; i <= maxColor; i++)
+					// for (int i = 0; i < smallestNumberOfColors; i++)
 					{
 						decisionNode *newNode;
 						newNode = (decisionNode*) malloc (sizeof (decisionNode));
