@@ -1,4 +1,4 @@
-#include <iostream>
+	#include <iostream>
 #include <unordered_set>
 #include <unordered_map>
 #include <fstream>
@@ -38,7 +38,7 @@ public:
 	    }
 	    else
 	    {
-	        for (int i = 1; i < numberOfColors; i++)
+	        for (int i = 0; i < numberOfColors; i++)
 	        {
 	            colors[position+1] = i;
 	            algorithm(graph, colors, position+1, smallestNumberOfColors, bestSolution);

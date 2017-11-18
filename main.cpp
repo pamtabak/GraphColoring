@@ -107,6 +107,11 @@ int main (int argc, char * argv[])
         BranchAndBound branchAndBound;
         branchAndBound.algorithm (graph, smallestNumberOfColors, bestSolution);
     }
+    else if (algorithm == "grasp")
+    {
+        MetaHeuristic metaHeuristic;
+        metaHeuristic.grasp (graph, smallestNumberOfColors, bestSolution);
+    }
     else
     {
         cout << "This algorithm was not implemented" << endl;
